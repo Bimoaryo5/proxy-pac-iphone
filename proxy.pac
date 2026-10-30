@@ -1,23 +1,21 @@
-function FindProxyForURL(url, host) {
-    host = host.toLowerCase();
+function FindProxyForURL(url, host)
+{
+    // variable strings to return
+    var proxy_yes = "PROXY proxy1.bri.co.id:1707";
+    var proxy_no = "DIRECT";
 
-    // Alamat intranet (hostname tanpa titik) -> langsung
-    if (isPlainHostName(host)) {
-        return "DIRECT";
-    }
+    // Intranet (hostname tanpa titik)
+    if (isPlainHostName(host)) { return proxy_no; }
 
-    // *.local dan *.bri.co.id -> langsung
-    if (dnsDomainIs(host, ".local") ||
-        dnsDomainIs(host, ".bri.co.id") ||
-        host === "bri.co.id") {
-        return "DIRECT";
-    }
+    // *.local
+    if (shExpMatch(host, "*.local")) { return proxy_no; }
 
-    // 10.202.75.146:5173 -> langsung
-    if (host === "10.202.75.146" && url.indexOf(":5173") !== -1) {
-        return "DIRECT";
-    }
+    // *.bri.co.id
+    if (shExpMatch(host, "*.bri.co.id")) { return proxy_no; }
 
-    // Sisanya lewat proxy, kalau proxy mati fallback ke direct
-    return "PROXY proxy1.bri.co.id:1707; DIRECT";
+    // 10.202.75.146:5173
+    if (shExpMatch(url, "*://10.202.75.146:5173*")) { return proxy_no; }
+
+    // Proxy anything else
+    return proxy_yes;
 }
